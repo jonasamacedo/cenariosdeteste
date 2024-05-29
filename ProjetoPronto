@@ -1,0 +1,47 @@
+```python
+import os
+from docx import Document
+from docx.shared import Inches
+from pathlib import Path
+
+# Define os caminhos das pastas
+pasta_imagens = Path.home() / 'Imagens do teste'
+pasta_descritos = Path.home() / 'Descritos do teste'
+pasta_saida = Path.home() / 'Documentos' / 'teste automatizados'
+
+# Cria a pasta de saída se não existir
+pasta_saida.mkdir(parents=True, exist_ok=True)
+
+# Nome do arquivo de saída
+arquivo_saida = pasta_saida / 'cenario_teste.docx'
+
+# Cria um novo documento
+documento = Document()
+
+# Adiciona um título ao documento
+documento.add_heading('Cenários de Teste', level=1)
+
+# Lista os arquivos de imagens e textos
+imagens = sorted(pasta_imagens.glob('*.jpg')) + sorted(pasta_imagens.glob('*.png'))
+descritos = sorted(pasta_descritos.glob('*.txt'))
+
+# Adiciona as imagens e os descritos ao documento
+for img_path, txt_path in zip(imagens, descritos):
+    # Adiciona a imagem
+    documento.add_picture(str(img_path), width=Inches(5))
+    documento.add_paragraph(f'Imagem: {img_path.name}')
+    
+    # Adiciona o descrito
+    with open(txt_path, 'r', encoding='utf-8') as file:
+        descrito = file.read()
+    documento.add_paragraph(descrito)
+    documento.add_paragraph(f'Descrição: {txt_path.name}')
+    
+    # Adiciona uma quebra de página
+    documento.add_page_break()
+
+# Salva o documento
+documento.save(arquivo_saida)
+
+print(f'Documento criado com sucesso: {arquivo_saida}')
+```
